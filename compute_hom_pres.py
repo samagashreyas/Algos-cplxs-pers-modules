@@ -38,17 +38,6 @@ def fix_zero_cols_g0_f0(f0: MatrixWithBirthDeathIdcs,
     g0.mat = sp.csc_matrix(g0.mat.A % 2)
     return f0, g0
 
-def read_off_bars(mat_r_d, col_degs, row_degs):
-    bars = []
-    for row in mat_r_d:
-        if len(mat_r_d[row]) > 0:
-            mat_r_d[row] = sorted(mat_r_d[row])
-            if row_degs[row] < col_degs[mat_r_d[row][0]]: # The design of the algorithm is such that it can give bars [1,1) which are unimportant.
-                bars.append([row_degs[row], col_degs[mat_r_d[row][0]]])
-        else:
-            bars.append([row_degs[row], np.inf])
-    
-    return bars
 
 def get_bars_hom_cplx_pres(f0: MatrixWithBirthDeathIdcs, g0: MatrixWithBirthDeathIdcs):
     f0, g0 = fix_zero_cols_g0_f0(f0, g0)
@@ -88,13 +77,16 @@ def get_bars_hom_cplx_pres(f0: MatrixWithBirthDeathIdcs, g0: MatrixWithBirthDeat
     
     f0_concat_zero_plus_q_concat_g1_restricted = f0_concat_zero_plus_q_concat_g1[g0_plus_r_ker_cols, :]
       
-    f0_concat_zero_plus_q_concat_g1_restricted_reduced_d, __, ___ = col_redn(f0_concat_zero_plus_q_concat_g1_restricted)
+    f0_concat_zero_plus_q_concat_g1_restricted_reduced_d, __, pivot_rows_cols = col_redn(f0_concat_zero_plus_q_concat_g1_restricted)
     row_degs_f0_concat_zero_plus_q_concat_g1_restricted_reduced = row_degs_f0_concat_zero_plus_q_concat_g1[g0_plus_r_ker_cols]
     
     f0_concat_zero_plus_q_concat_g1_restricted_reduced_r_d = get_dict_from_sparse_mat(get_sparse_matrix_from_dict(
                                                             f0_concat_zero_plus_q_concat_g1_restricted_reduced_d, 
                                                             shape=(len(g0_plus_r_ker_cols), f0_concat_zero_plus_q_concat_g1.shape[1])).tocsr())
     
-    bars = read_off_bars(f0_concat_zero_plus_q_concat_g1_restricted_reduced_r_d, col_degs_f0_concat_zero_plus_q_concat_g1, row_degs_f0_concat_zero_plus_q_concat_g1_restricted_reduced)
+    bars = read_off_bars(f0_concat_zero_plus_q_concat_g1_restricted_reduced_r_d, 
+                         col_degs_f0_concat_zero_plus_q_concat_g1, 
+                         row_degs_f0_concat_zero_plus_q_concat_g1_restricted_reduced,
+                         pivot_rows_cols)
     
     return bars
