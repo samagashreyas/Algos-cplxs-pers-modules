@@ -166,7 +166,7 @@ class MatrixWithBirthDeathIdcs:
         self.row_deaths = row_deaths
         self.col_deaths = col_deaths
 
-def read_off_bars(mat_r_d, col_degs, row_degs, pivot_rows_cols):
+def read_off_bars(col_degs, row_degs, pivot_rows_cols):
     bars = []
     pivot_rows = []
     for i in range(len(pivot_rows_cols)):
